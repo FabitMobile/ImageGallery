@@ -1,7 +1,7 @@
 import UIKit
 
 public protocol ImageGalleryModuleInput {
-    func configureModule(provider: GalleryAsyncImagesProvider, previews: [UIImage])
+    func configureModule(provider: GalleryAsyncImagesProvider, previews: [UIImage], title: String?)
     func configureModule(images: [ImageObject], showCloseButton: Bool, handlePanGesture: Bool)
     func configureModule(images: [ImageObject], selectedIndex: Int, showCloseButton: Bool, handlePanGesture: Bool)
 }
@@ -28,6 +28,7 @@ public class ImageGalleryViewController: UIViewController,
     var currentIndex = 0
     var showCloseButton: Bool = true
     var shouldHandlePanGesture: Bool = true
+    var navigationTitle: String?
 
     // MARK: DI
 
@@ -52,7 +53,7 @@ public class ImageGalleryViewController: UIViewController,
 
     // MARK: - ImageGalleryModuleInput
 
-    public func configureModule(provider: GalleryAsyncImagesProvider, previews: [UIImage]) {
+    public func configureModule(provider: GalleryAsyncImagesProvider, previews: [UIImage], title: String? = nil) {
         viewModel.images = previews
 
         let previews = previews.map { ImagePreviewState.image($0) } + [.loading]
@@ -68,6 +69,9 @@ public class ImageGalleryViewController: UIViewController,
             let previews = images.map { ImagePreviewState.image($0) }
             __self.previewController.configureModule(images: previews, selectItem: 0)
         }
+        
+        self.navigationTitle = title
+        navigationItem.title = title
     }
 
     public func configureModule(images: [ImageObject], showCloseButton: Bool, handlePanGesture: Bool) {
@@ -171,18 +175,12 @@ public class ImageGalleryViewController: UIViewController,
     }
 
     func updateNavigationTitle(_ viewModel: ImageGalleryViewModel) {
-        navigationItem.title = NSLocalizedString("ImageGallery_navigation_title_singlePhoto", comment: "")
-        // TODO: fix later
-        // disable in #41237#note-12
-//        if viewModel.images.count == 1 {
-//            navigationItem.title = R.string.localizable.imageGallery_navigation_title_singlePhoto()
-//        } else {
-//            let a = String(viewModel.selectedIndex + 1)
-//            let b = String(viewModel.images.count)
-//
-//            navigationItem.title = R.string.localizable
-//                .imageGallery_navigation_title_one_of(a, b)
-//        }
+        
+        if let title = self.navigationTitle {
+            navigationItem.title = title
+        } else {
+            navigationItem.title = NSLocalizedString("ImageGallery_navigation_title_singlePhoto", comment: "")
+        }
     }
 
     // MARK: - GalleryPreviewModuleOutput
