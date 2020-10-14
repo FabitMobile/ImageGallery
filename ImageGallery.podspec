@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ImageGallery'
-  s.version          = '1.1.1'
+  s.version          = '1.2.0'
   s.summary          = 'image gallery ui component'
   s.homepage         = 'https://github.com/FabitMobile/ImageGallery.git'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }

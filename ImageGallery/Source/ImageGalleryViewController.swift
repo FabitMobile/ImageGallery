@@ -54,20 +54,29 @@ public class ImageGalleryViewController: UIViewController,
     // MARK: - ImageGalleryModuleInput
 
     public func configureModule(provider: GalleryAsyncImagesProvider, previews: [UIImage], title: String? = nil) {
-        viewModel.images = previews
-
-        let previews = previews.map { ImagePreviewState.image($0) } + [.loading]
-        previewController.configureModule(images: previews, selectItem: 0)
-        configure()
-
-        provider.callback = { [weak self] images in
-            guard let __self = self else { return }
-            __self.viewModel.selectedIndex = 0
-            __self.viewModel.images = images
-            __self.configure()
-
-            let previews = images.map { ImagePreviewState.image($0) }
-            __self.previewController.configureModule(images: previews, selectItem: 0)
+        provider.callback = { [weak self] images, leftToLoad in
+            DispatchQueue.main.async { [weak self] in
+                guard let __self = self else { return }
+                guard images.count > 0 else {
+                    __self.viewModel.images = previews
+                    
+                    let previews = previews.map { ImagePreviewState.image($0) } + [.loading]
+                    __self.previewController.configureModule(images: previews, selectItem: 0)
+                    __self.configure()
+                    return
+                }
+                
+                
+                __self.viewModel.selectedIndex = 0
+                __self.viewModel.images = images
+                __self.configure()
+                
+                var previews = images.map { ImagePreviewState.image($0) }
+                if leftToLoad > 0 {
+                    previews.append(.loading)
+                }
+                __self.previewController.configureModule(images: previews, selectItem: 0)
+            }
         }
         
         self.navigationTitle = title

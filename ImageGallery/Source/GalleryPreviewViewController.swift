@@ -1,7 +1,7 @@
 import UIKit
 
 protocol GalleryPreviewModuleInput {
-    func configureModule(images: [ImagePreviewState], selectItem: Int)
+    func configureModule(images: [ImagePreviewState], selectItem: Int?)
 }
 
 protocol GalleryPreviewModuleOutput: AnyObject {
@@ -91,9 +91,11 @@ class GalleryPreviewViewController: UICollectionViewController, GalleryPreviewMo
 
     // MARK: GalleryPreviewModuleInput
 
-    func configureModule(images: [ImagePreviewState], selectItem: Int) {
+    func configureModule(images: [ImagePreviewState], selectItem: Int?) {
         viewModel.images = images
-        viewModel.selectedItem = selectItem
+        if let selectItem = selectItem {
+            viewModel.selectedItem = selectItem
+        }
         collectionView.reloadData()
     }
 
