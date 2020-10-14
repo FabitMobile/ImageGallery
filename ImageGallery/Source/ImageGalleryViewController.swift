@@ -54,7 +54,7 @@ public class ImageGalleryViewController: UIViewController,
     // MARK: - ImageGalleryModuleInput
 
     public func configureModule(provider: GalleryAsyncImagesProvider, previews: [UIImage], title: String? = nil) {
-        provider.callback = { [weak self] images in
+        provider.callback = { [weak self] images, leftToLoad in
             DispatchQueue.main.async { [weak self] in
                 guard let __self = self else { return }
                 guard images.count > 0 else {
@@ -71,7 +71,10 @@ public class ImageGalleryViewController: UIViewController,
                 __self.viewModel.images = images
                 __self.configure()
                 
-                let previews = images.map { ImagePreviewState.image($0) }
+                var previews = images.map { ImagePreviewState.image($0) }
+                if leftToLoad > 0 {
+                    previews.append(.loading)
+                }
                 __self.previewController.configureModule(images: previews, selectItem: 0)
             }
         }
